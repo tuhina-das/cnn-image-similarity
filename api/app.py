@@ -1,6 +1,7 @@
 import sys
 import os
-from flask import Flask
+from flask import Flask, jsonify
+
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
@@ -15,7 +16,7 @@ import kagglehub
 app = Flask(__name__)
 
 
-@app.route("/api/python")
+@app.route("/api/app")
 
 def setup():
     print("-------------------------------------------")
@@ -38,17 +39,16 @@ def setup():
     print("Now, time to test similarity function:")
     os.chdir(os.path.dirname(__file__))
     print(os.getcwd())
-    calculate_similarity('./images/black.jpg', './images/galaxywolf.jpg')
     print("-------------------------------------------")
     print("                 END OF SETUP              ")
     print("-------------------------------------------")
+    return jsonify(calculate_similarity('./images/black.jpg', './images/galaxywolf.jpg'))
 
 
 # Main script that executes when run
 def main(): 
     # first, setting up global variables and testing the cosine sim function (simply just that it' executable)
     setup()
-    
     
 
 class TensorVector(object):
@@ -105,11 +105,10 @@ def calculate_similarity(v1path, v2path):
     vector2 = helper.process()
     
     # Question: How do we get .imshow to display an image?
-    plt.imshow(convertBase64(v1path))
+    # plt.imshow(convertBase64(v1path))
     
     output = cosineSim(vector, vector2)
-    print(output)
-    cosine_sim_outputs.append(output)
+    return cosine_sim_outputs.append(output)
 
 
 if __name__ == "__main__":
