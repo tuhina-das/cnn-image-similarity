@@ -1,56 +1,41 @@
-import sys
 import os
-from flask import Flask, jsonify
-
+from flask import Flask,request, jsonify
+from flask_cors import CORS
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import base64
 from PIL import Image
 import io
-import math
 from math import sqrt
-import kagglehub
+## While I'm not using these libraries just yet, I'm keeping them in my project in case I'd like to add some 
+## scatterplots in the future
+# import pandas as pd
+# import matplotlib.pyplot as plt
+
 app = Flask(__name__)
+CORS(app)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+models_dir = os.path.join(BASE_DIR, 'models')
+parent_dir = os.path.dirname(os.path.abspath(__file__))
 
+# Load model
+global embed
+embed = hub.KerasLayer(parent_dir + "/models")
 
-@app.route("/api/app")
-
-def setup():
-    print("-------------------------------------------")
-    print("                 START OF SETUP             ")
-    print("-------------------------------------------")
-    print("Python VE: " + sys.executable)
-    # base directory to ensure that we start running Python from the same directory
-    BASE_DIR = './api/models'
-    os.chdir(BASE_DIR)
-    # check current directory
-    print("Current directory items: ")
-    for x in os.listdir("."):
-        print(x)
-    # embed model
-    global embed
-    embed = hub.KerasLayer(os.getcwd())
-    print("Python confirmed, path embedded, directory checked")
-    global cosine_sim_outputs
-    cosine_sim_outputs = []
-    print("Now, time to test similarity function:")
-    os.chdir(os.path.dirname(__file__))
-    print(os.getcwd())
-    print("-------------------------------------------")
-    print("                 END OF SETUP              ")
-    print("-------------------------------------------")
-    return jsonify(calculate_similarity('./images/black.jpg', './images/galaxywolf.jpg'))
-
-
-# Main script that executes when run
-def main(): 
-    # first, setting up global variables and testing the cosine sim function (simply just that it' executable)
-    setup()
+@app.route("/api/app", methods=['POST'])
+def receive_data():
+    data = request.get_json()
+    v1path = '../public' + data.get('string1')
+    v2path = '../public' + data.get('string2')
     
-
+    similarity_value = str(calculate_similarity(v1path, v2path))
+    
+    response = {
+        "response": similarity_value
+    }
+    return jsonify(response), 200  # Return a 200 OK status
+    
 class TensorVector(object):
 
     def __init__(self, FileName=None):
@@ -94,7 +79,6 @@ def cosineSim(a1,a2):
     cosine_sim = sum / ((sqrt(suma1))*(sqrt(sumb1)))
     return cosine_sim
 
-
 def calculate_similarity(v1path, v2path):
     # process v1
     helper = TensorVector(v1path)
@@ -107,9 +91,10 @@ def calculate_similarity(v1path, v2path):
     # Question: How do we get .imshow to display an image?
     # plt.imshow(convertBase64(v1path))
     
-    output = cosineSim(vector, vector2)
-    return cosine_sim_outputs.append(output)
+    return cosineSim(vector, vector2)
+    # Commented out for testing
+    # return cosine_sim_outputs.append(output)
 
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
