@@ -76,13 +76,23 @@ export default function Home() {
         const data_rounded = Math.ceil(data.response * 100);
         console.log("Response from Flask:", data_rounded); // debug
         if (data_rounded >= 90) {
-          setMessage("These images are definitely similar");
+          setMessage(
+            "These images are definitely similar - " +
+              data_rounded +
+              "% Similar"
+          );
         } else if (data_rounded >= 80) {
-          setMessage("These images are likely similar");
+          setMessage(
+            "These images are likely similar - " + data_rounded + "% Similar"
+          );
         } else if (data_rounded >= 70) {
-          setMessage("These images are sort of similar");
+          setMessage(
+            "These images are sort of similar - " + data_rounded + "% Similar"
+          );
         } else {
-          setMessage("These images aren't really similar");
+          setMessage(
+            "These images aren't really similar - " + data_rounded + "% Similar"
+          );
         }
       })
       .catch((error) => {
