@@ -1,0 +1,10 @@
+product_image, item_photo, merchandise_picture
+shopping_cart, digital_cart, online_basket
+user_profile, account, customer
+clothing, fashion, apparel
+electronics, gadgets, devices
+jewelry, accessories, valuables
+reviews, ratings, customer_feedback
+product_listing, item_details, description
+checkout_page, payment_screen, order_form
+shipping_info, delivery_details, tracking_number

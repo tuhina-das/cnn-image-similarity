@@ -1,5 +1,5 @@
 import os
-from flask import Flask,request, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -8,10 +8,8 @@ import base64
 from PIL import Image
 import io
 from math import sqrt
-## While I'm not using these libraries just yet, I'm keeping them in my project in case I'd like to add some 
-## scatterplots in the future
-# import pandas as pd
-# import matplotlib.pyplot as plt
+from retail_detection import get_retail_detection, get_image_embedding
+# Removing matplotlib and pandas since they're not used 
 
 app = Flask(__name__)
 CORS(app)
@@ -19,17 +17,61 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 models_dir = os.path.join(BASE_DIR, 'models')
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Load model
+# Keyword detection/assignment w/ Cursor's help lol
+# ------------------------------------------------------------------------------------------------  
+# loading TF model
 global embed
 embed = hub.KerasLayer(parent_dir + "/models")
 
-@app.route("/api/app", methods=['POST'])
+# importing CLIP models and categories from retail_detection
+# from retail_detection import (
+#     clip_model,
+#     clip_processor, 
+#     RETAIL_CATEGORIES,
+#     get_retail_detection
+# )
+
+# @app.route("/api/detect", methods=['POST'])
+# # NTS TO GO BACK HERE AND WRIT WHAT THIS IS
+# def detect_items():
+#     # getting image path from frontend's POST request (if one is made)
+#     data = request.get_json()
+#     image_path = '../public' + data.get('image_path')
+    
+#     try:
+#         # calls the get_retail_detection function from retail_detection.py
+#         results = get_retail_detection(image_path)
+#         detections = results['detections']
+        
+#         # Check for suspicious activity -- NTS to go back here and delete this, because it's unnecessary
+#         suspicious = any(
+#             d["confidence"] > 0.6 and 
+#             d["category"] in [
+#                 "person concealing item",
+#                 "group of people", 
+#                 "security tag"
+#             ]
+#             for d in detections
+#         )
+        
+#         # should return keywords for the given image
+#         return jsonify({
+#             "detections": detections,
+#             "suspicious": suspicious
+#         }), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 400
+# # ------------------------------------------------------------------------------------------------  
+
+# Image detection code for OW
+@app.route("/backend/api/app", methods=['POST'])
 def receive_data():
     data = request.get_json()
-    v1path = '../public' + data.get('string1')
-    v2path = '../public' + data.get('string2')
+    v1path = '../../public' + data.get('string1')
+    v2path = '../../public' + data.get('string2')
     
     similarity_value = str(calculate_similarity(v1path, v2path))
+    print("we got here!")
     
     response = {
         "response": similarity_value
@@ -95,6 +137,5 @@ def calculate_similarity(v1path, v2path):
     # Commented out for testing
     # return cosine_sim_outputs.append(output)
 
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

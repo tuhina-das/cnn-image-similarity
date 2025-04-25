@@ -61,7 +61,7 @@ export default function Home() {
   }
 
   function submitInfo() {
-    fetch("http://127.0.0.1:5000/api/app", {
+    fetch("http://127.0.0.1:5000/backend/api/app", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
